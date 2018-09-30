@@ -1,8 +1,10 @@
 const matrix = require('node-sense-hat').Leds;
 var mqtt = require('mqtt');
 var HOST = 'localhost';
-var client = mqtt.connect('mqtt://' + HOST; { port 1883 });
+var client = mqtt.connect('mqtt://' + HOST, { port: 1883 });
+const fs = require('fs');
 
+fs.writeFile("/home/pi/test", "testets");
 client.on('connect', function () {
 	console.log('connected to ' + HOST);
 	client.subscribe('hermes/hotword/default/detected');
