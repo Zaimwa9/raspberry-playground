@@ -1,0 +1,17 @@
+{
+  "name": "raspiApp",
+  "version": "0.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "mqtt": "^2.18.8",
+    "node-sense-hat": "^0.0.2",
+    "sense-hat-led": "^1.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
