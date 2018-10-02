@@ -12,7 +12,8 @@ client.on('connect', function () {
 });
 
 client.on('message', function (topic, message) {
-	console.log(topic);
+	var payload = JSON.parse(message);
+	console.log(payload);
 	console.log('message received ' + topic)
 	if (topic == 'hermes/intent/wzaim:colorChange') {
 		var x = 0;
@@ -27,8 +28,15 @@ client.on('message', function (topic, message) {
 			}
 			x++;
 		}
+		var resp = {
+		'sessionId': payload.sessionId,
+		'text': 'Colors changed'
+		}
+		console.log(resp);
+		client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
 	}
-	if (topic == 'hermes/intent/wzaim:turnOff') {
+
+	if (topic == 'hermes/intent/wzaim:turnOff' && payload.slots.length == 0) {
 		var x = 0;
 		var y = 0;
 		var off = [0, 0, 0];
@@ -40,5 +48,29 @@ client.on('message', function (topic, message) {
 			}
 			x++;
 		}
+	}
+
+	if (topic == 'hermes/intent/wzaim:turnOff' && payload.slots.length > 0) {
+		var slots = payload.slots[0];
+		var value = parseInt(slots.value.value);
+		console.log(slots.value);
+		console.log(slots.value.value);
+		console.log(value);
+		if (value < 64) {
+			var y = Math.floor(value / 8);
+			var x = value % 8;
+			console.log(x, y);
+			var off = [0, 0, 0]
+			matrix.setPixel(x, y, off);
+		} else {
+			var resp = {
+				'sessionId': payload.sessionId,
+				'text': "C'est trop grand morbleu !! Elle n'existe pas ! Choisis-en une entre 0 et 63"
+			}
+			client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
+			console.log('Trop grand');
+		}
+
+		//console.log(JSON.parse(slots.value));
 	}
 })
