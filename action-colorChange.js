@@ -5,7 +5,6 @@ var HOST = 'localhost';
 var client = mqtt.connect('mqtt://' + HOST, { port: 1883 });
 const fs = require('fs');
 
-fs.writeFile("/home/pi/test", "testets");
 client.on('connect', function () {
 	console.log('connected to ' + HOST);
 	client.subscribe('hermes/hotword/default/detected');
@@ -62,9 +61,6 @@ client.on('message', function (topic, message) {
 		var value = parseInt(slots.value.value);
 		if (slotsMax === null) {
 			if (value < 64) {
-				//var y = Math.floor(value / 8);
-				//var x = value % 8;
-				//var off = [0, 0, 0]
 				matrix.setPixel(value % 8, Math.floor(value / 8), [0, 0, 0]);
 				var resp = {
 					'sessionId': payload.sessionId,
@@ -89,7 +85,6 @@ client.on('message', function (topic, message) {
 			}
 			valueMax = valueMax > 63 ? 63 : valueMax;
 			for (var i = value; i <= valueMax; i++) {
-				console.log(value, valueMax, i);
 				matrix.setPixel(i % 8, Math.floor(i / 8), [0, 0, 0])
 			}
 			var resp = {
