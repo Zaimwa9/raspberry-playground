@@ -28,4 +28,17 @@ client.on('message', function (topic, message) {
 			x++;
 		}
 	}
+	if (topic == 'hermes/intent/wzaim:turnOff') {
+		var x = 0;
+		var y = 0;
+		var off = [0, 0, 0];
+		while (x < 8) {
+			y = 0;
+			while (y < 8) {
+				matrix.setPixel(x, y, off);
+				y++;
+			}
+			x++;
+		}
+	}
 })
