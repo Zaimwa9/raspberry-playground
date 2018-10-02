@@ -1,4 +1,5 @@
 const matrix = require('node-sense-hat').Leds;
+const sense = require("sense-hat-led");
 var mqtt = require('mqtt');
 var HOST = 'localhost';
 var client = mqtt.connect('mqtt://' + HOST, { port: 1883 });
@@ -13,8 +14,6 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
 	var payload = JSON.parse(message);
-	console.log(payload);
-	console.log('message received ' + topic)
 	if (topic == 'hermes/intent/wzaim:colorChange') {
 		var x = 0;
 		var y = 0;
@@ -28,9 +27,10 @@ client.on('message', function (topic, message) {
 			}
 			x++;
 		}
+		var answers = ["J'ai change les couleurs", "Colors changed", "Je vous fais ça de suite", "Encore du travail ?"];
 		var resp = {
 		'sessionId': payload.sessionId,
-		'text': 'Colors changed'
+		'text': answers[Math.floor(Math.random() * 4)]
 		}
 		console.log(resp);
 		client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
@@ -48,18 +48,20 @@ client.on('message', function (topic, message) {
 			}
 			x++;
 		}
+		var answers = ["Bonne nuit", "C'est fait, puis-je disposer ?", "Les lumieres ont ete eteintes"];
+		var resp = {
+		'sessionId': payload.sessionId,
+		'text': answers[Math.floor(Math.random() * 3)]
+		}
+		client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
 	}
 
 	if (topic == 'hermes/intent/wzaim:turnOff' && payload.slots.length > 0) {
 		var slots = payload.slots[0];
 		var value = parseInt(slots.value.value);
-		console.log(slots.value);
-		console.log(slots.value.value);
-		console.log(value);
 		if (value < 64) {
 			var y = Math.floor(value / 8);
 			var x = value % 8;
-			console.log(x, y);
 			var off = [0, 0, 0]
 			matrix.setPixel(x, y, off);
 		} else {
@@ -70,7 +72,26 @@ client.on('message', function (topic, message) {
 			client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
 			console.log('Trop grand');
 		}
+	}
 
-		//console.log(JSON.parse(slots.value));
+	if (topic == 'hermes/intent/wzaim:displayWord' && payload.slots.length > 0) {
+		var slots = payload.slots[0];
+		var value = slots.value.value;
+		console.log(slots);
+		console.log(value);
+		if (value.length > 0) {	
+				var word = ' ';
+				for (var i = 0; i < value.length; i++) {
+					word += value[i] + ', ';
+				}
+				var resp = {
+				'sessionId': payload.sessionId,
+				'text': 'Le mot ' + value + " s'ecrit:" + word
+				}
+			client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));	
+			sense.showMessage(value, 0.3, [253, 241, 184], function () {
+				matrix.clear();
+			})
+		}
 	}
 })
