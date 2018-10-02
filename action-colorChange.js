@@ -50,27 +50,53 @@ client.on('message', function (topic, message) {
 		}
 		var answers = ["Bonne nuit", "C'est fait, puis-je disposer ?", "Les lumieres ont ete eteintes"];
 		var resp = {
-		'sessionId': payload.sessionId,
-		'text': answers[Math.floor(Math.random() * 3)]
+			'sessionId': payload.sessionId,
+			'text': answers[Math.floor(Math.random() * 3)]
 		}
 		client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
 	}
 
 	if (topic == 'hermes/intent/wzaim:turnOff' && payload.slots.length > 0) {
 		var slots = payload.slots[0];
+		var slotsMax = payload.slots[1] ? payload.slots[1] : null;
 		var value = parseInt(slots.value.value);
-		if (value < 64) {
-			var y = Math.floor(value / 8);
-			var x = value % 8;
-			var off = [0, 0, 0]
-			matrix.setPixel(x, y, off);
+		if (slotsMax === null) {
+			if (value < 64) {
+				//var y = Math.floor(value / 8);
+				//var x = value % 8;
+				//var off = [0, 0, 0]
+				matrix.setPixel(value % 8, Math.floor(value / 8), [0, 0, 0]);
+				var resp = {
+					'sessionId': payload.sessionId,
+					'text': "j'ai eteint la lumiere: " + value
+				}
+
+				client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
+			} else {
+				var resp = {
+					'sessionId': payload.sessionId,
+					'text': "C'est trop grand morbleu !! Elle n'existe pas ! Choisis-en une entre 0 et 63"
+				}
+				client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
+				console.log('Trop grand');
+			}
 		} else {
+			console.log('range');
+			var valueMax = parseInt(slotsMax.value.value);
+			if (valueMax < value) {
+				value = valueMax;
+				valueMax = parseInt(slots.value.value);
+			}
+			valueMax = valueMax > 63 ? 63 : valueMax;
+			for (var i = value; i <= valueMax; i++) {
+				console.log(value, valueMax, i);
+				matrix.setPixel(i % 8, Math.floor(i / 8), [0, 0, 0])
+			}
 			var resp = {
 				'sessionId': payload.sessionId,
-				'text': "C'est trop grand morbleu !! Elle n'existe pas ! Choisis-en une entre 0 et 63"
+				'text': "J'ai eteint les lumieres de: " + value + ' a: ' + valueMax
 			}
 			client.publish('hermes/dialogueManager/endSession', JSON.stringify(resp));
-			console.log('Trop grand');
 		}
 	}
 
