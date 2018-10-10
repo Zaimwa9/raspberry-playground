@@ -23,6 +23,7 @@ You need to have a Snips account and an assistant with the Snips app linked to f
 A working Sense Hat Led Panel.
 
 Mandatory: _snips-skills must have permissions to gpio, plugdev, netdev, i2c (Sense hat requires to read /dev/fb1 to light on a led)
+On your raspberry pi: `sudo usermod -a -G gpio _snips-skills` and to all the appropriate groups.
 
 # How to use
 
