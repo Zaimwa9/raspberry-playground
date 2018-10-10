@@ -1,4 +1,6 @@
-const matrix = require('node-sense-hat').Leds;
+#!/usr/bin/env node
+
+const matrix = require("node-sense-hat").Leds;
 const sense = require("sense-hat-led");
 var mqtt = require('mqtt');
 var HOST = 'localhost';
